@@ -1,4 +1,4 @@
-# Change these variables as necessary.
+# Adapted from: https://gist.github.com/alexedwards/3b40775846535d0014ab1ff477e4a568
 MAIN_PACKAGE_PATH := ./cmd/web
 BINARY_NAME := time2go
 
