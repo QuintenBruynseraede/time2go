@@ -2,6 +2,7 @@
     <div
       class="shadow-2xl border border-slate-400 rounded-3xl bg-stone-100 container max-w-screen-md mx-auto sm mt-4 pt-0 p-4"
     >
+    <form hx-post="/form" hx-target="#response">
       <div class="text-2xl text-center p-4">
         <span>I want to do a</span>
         <span class="inline-block"
@@ -75,38 +76,25 @@
         </span>
       </div>
       <div class="grid grid-flow-col place-content-center p-2" role="group">
-        <button
-          type="button"
-          class="text-base bg-stone-200 hover:bg-slate-300 rounded-lg py-3 me-2 mb-2 px-4"
-        >
-          Today
-        </button>
-        <button
-          type="button"
-          class="text-base bg-stone-200 hover:bg-slate-300 rounded-lg px-2 py-3 me-2 mb-2 px-4"
-          -
-        >
-          Tomorrow
-        </button>
-        <button
-          type="button"
-          class="text-base bg-stone-200 hover:bg-slate-300 rounded-lg px-2 py-3 me-2 mb-2 px-4"
-        >
-          In the coming week
-        </button>
-        <button
-          type="button"
-          class="text-base bg-stone-200 hover:bg-slate-300 rounded-lg px-2 py-3 me-2 mb-2 px-4"
-        >
-          Custom
-        </button>
+        <div class="text-base bg-stone-200 has-[:checked]:bg-slate-300 rounded-lg py-3 me-2 mb-2 px-4">
+            <input class="hidden peer" type="radio" id="today" name="daterange" value="today" checked>
+            <label class="p-4 peer-[:checked]:underline" for="today">Today</label>
+        </div>
+        <div class="text-base bg-stone-200 has-[:checked]:bg-slate-300 rounded-lg py-3 me-2 mb-2 px-4">
+          <input class="hidden peer" type="radio" id="tomorrow" name="daterange" value="tomorrow">
+          <label class="p-4 peer-[:checked]:underline" for="tomorrow">Tomorrow</label>
+        </div>
+        <div class="text-base bg-stone-200 has-[:checked]:bg-slate-300 rounded-lg py-3 me-2 mb-2 px-4">
+          <input class="hidden peer" type="radio" id="this_week" name="daterange" value="this_week">
+          <label class="p-4 peer-[:checked]:underline" for="this_week">This week</label>
+        </div>
       </div>
       <div class="grid p-2 place-content-center">
-        <button
+        <input type="submit"
           class="font-bold bg-stone-300 hover:bg-slate-300 rounded-lg py-3 px-8"
-        >
-          Find the best moment
-        </button>
+        value="Find the best moment ">
+    </input>
       </div>
+      </form>
     </div>
 {{end}}

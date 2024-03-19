@@ -1,16 +1,45 @@
 package main
 
 import (
-	"fmt"
+	"flag"
+	"log/slog"
 	"net/http"
+	"os"
+	"text/template"
 )
 
-func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/snippet/view", snippetView)
-	mux.HandleFunc("/snippet/create", snippetCreate)
+type application struct {
+	logger    *slog.Logger
+	templates *template.Template
+}
 
-	fmt.Println("Serving at http://localhost:4001")
-	http.ListenAndServe(":4001", mux)
+func main() {
+	addr := flag.String("addr", ":4000", "HTTP Network address to serve")
+	flag.Parse()
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{}))
+
+	files := []string{
+		"./ui/html/form.tpl",
+		"./ui/html/head.tpl",
+		"./ui/html/response.tpl",
+		"./ui/html/spacer.tpl",
+		"./ui/html/footer.tpl",
+		"./ui/html/pages/index.tpl",
+	}
+	templates, err := template.ParseFiles(files...)
+	if err != nil {
+		logger.Error("Unable to parse templates!")
+		os.Exit(1)
+	}
+
+	app := &application{logger: logger, templates: templates}
+	mux := app.routes()
+
+	logger.Info("Starting server", "addr", *addr)
+	err = http.ListenAndServe(*addr, mux)
+	if err != nil {
+		logger.Error("Exception when running server", "error", err)
+		os.Exit(1)
+	}
 }

@@ -5,7 +5,7 @@
 <body class="bg-sky-50">
     {{template "form" .}}
     {{template "spacer" .}}
-    {{template "response" .}}
+    <div id="response"></div>
     {{template "footer" .}}
   </body>
 </html>
