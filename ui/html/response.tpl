@@ -79,8 +79,8 @@
               '<div class="rounded-lg p-2 shadow border custom-tooltip"><span>' +
               `<p><b>${TimeRanges[dataPointIndex]}</p></b>` +
               `<p><b>Temperature (${actualTemperature[dataPointIndex]}C)</b>: ${series[0][dataPointIndex]} points</p>` +
-              `<p><b>Precipitation (${actualPrecipitation[dataPointIndex]}mm)</b>: ${series[1][dataPointIndex]} points</p>` +
-              `<p><b>Cloud Cover(${actualCloudCover[dataPointIndex]}%)</b>: ${series[2][dataPointIndex]} points</p>` +
+              `<p><b>Cloud Cover(${actualCloudCover[dataPointIndex]}%)</b>: ${series[1][dataPointIndex]} points</p>` +
+              `<p><b>Precipitation (${actualPrecipitation[dataPointIndex]}mm)</b>: ${series[2][dataPointIndex]} points</p>` +
               "</span></div>"
             );
           },

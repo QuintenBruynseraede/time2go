@@ -1,10 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/QuintenBruynseraede/time2go/internal/location"
 	"github.com/QuintenBruynseraede/time2go/internal/models"
 	"github.com/QuintenBruynseraede/time2go/internal/utils"
+	"github.com/QuintenBruynseraede/time2go/internal/weather"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -21,32 +25,50 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) form(w http.ResponseWriter, r *http.Request) {
-	app.logger.Info("Handling request", "request", r.URL)
-
-	timeRanges := []string{"00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"}
-	actualPrecipitation := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24}
-	actualTemperatures := []int{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9}
-	actualCloudCover := []int{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}
-	precipitationScores := utils.Repeat(2, 24)
-	temperatureScores := utils.Repeat(3, 24)
-	cloudCoverScores := utils.Repeat(4, 24)
-
-	data := models.Response{
-		TimeRangeList: utils.FormatAsJSList(timeRanges, true),
-
-		PrecipitationList: utils.FormatAsJSList(actualPrecipitation, false),
-		TemperatureList:   utils.FormatAsJSList(actualTemperatures, false),
-		CloudCoverList:    utils.FormatAsJSList(actualCloudCover, false),
-
-		PrecipitationScoreList: utils.FormatAsJSList(precipitationScores, false),
-		TemperatureScoreList:   utils.FormatAsJSList(temperatureScores, false),
-		CloudCoverScoreList:    utils.FormatAsJSList(cloudCoverScores, false),
-
-		RecommendedMoment:           "Friday between X and Y",
-		RecommendedTimeRangeIndices: utils.FormatAsJSList([]int{0, 1, 2, 3, 4}, false),
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
-	err := app.templates.ExecuteTemplate(w, "response", data)
+	// location := r.FormValue("location")
+	dateRange := r.FormValue("daterange")
+	duration, err := strconv.Atoi(r.FormValue("duration"))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Unable to case duration %v to int", duration), http.StatusBadRequest)
+	}
+
+	timeRange, err := utils.DateRangeInputToTimeRange(dateRange)
+	if err != nil {
+		http.Error(w, "Invalid date range", http.StatusBadRequest)
+	}
+
+	timeLabels := utils.GenerateTimeRangeLabels(timeRange)
+	// TODO hardcoded to Paris coordinates
+	forecast, err := weather.GetForecast(location.Location{Latitude: 48.864716, Longitude: 2.349014}, timeRange)
+	if err != nil {
+		http.Error(w, "Unable to get Weather forecast", http.StatusInternalServerError)
+		return
+	}
+
+	scores := weather.ScoreForecast(forecast, duration)
+	best := fmt.Sprintf("Between %s and %s", timeLabels[scores.BestIndices[0]], timeLabels[scores.BestIndices[len(scores.BestIndices)-1]])
+
+	data := models.Response{
+		TimeRangeList: utils.FormatAsJSList(timeLabels, true),
+
+		PrecipitationList: utils.FormatAsJSList(forecast.Precipitation, false),
+		TemperatureList:   utils.FormatAsJSList(forecast.Temperatures, false),
+		CloudCoverList:    utils.FormatAsJSList(forecast.CloudCover, false),
+
+		PrecipitationScoreList: utils.FormatAsJSList(scores.PrecipitationScores, false),
+		TemperatureScoreList:   utils.FormatAsJSList(scores.TemperatureScores, false),
+		CloudCoverScoreList:    utils.FormatAsJSList(scores.CloudCoverScores, false),
+
+		RecommendedMoment:           best,
+		RecommendedTimeRangeIndices: utils.FormatAsJSList(scores.BestIndices, false),
+	}
+
+	err = app.templates.ExecuteTemplate(w, "response", data)
 	if err != nil {
 		app.logger.Error(err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
