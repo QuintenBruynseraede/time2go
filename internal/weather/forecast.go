@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/QuintenBruynseraede/time2go/internal/location"
 	"github.com/QuintenBruynseraede/time2go/internal/timerange"
 	"github.com/QuintenBruynseraede/time2go/internal/utils"
 )
 
-func GetForecast(location location.Location, timerange timerange.TimeRange) (Forecast, error) {
+func GetForecast(lat float64, long float64, timerange timerange.TimeRange) (Forecast, error) {
 	// Returns a forecast for all hours within the timerange
-	url := buildRequestUrl(location)
+	url := buildRequestUrl(long, lat)
 	raw, error := utils.MakeRequest(url)
 
 	if error != nil {
@@ -50,13 +49,13 @@ type Forecast struct {
 	Precipitation []int // Precipitation in mm
 }
 
-func buildRequestUrl(location location.Location) string {
+func buildRequestUrl(lat float64, long float64) string {
 	BASE_URL := "https://api.open-meteo.com/v1/forecast"
 	return fmt.Sprintf(
 		`%s?latitude=%v&longitude=%v&hourly=temperature_2m,precipitation,cloud_cover&timezone=auto`,
 		BASE_URL,
-		location.Latitude,
-		location.Longitude,
+		lat,
+		long,
 	)
 }
 

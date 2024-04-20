@@ -2,15 +2,21 @@ package main
 
 import (
 	"flag"
+	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
-	"text/template"
+
+	"github.com/QuintenBruynseraede/time2go/internal"
+	"github.com/QuintenBruynseraede/time2go/internal/cities"
+	"github.com/QuintenBruynseraede/time2go/internal/trie"
 )
 
 type application struct {
-	logger    *slog.Logger
-	templates *template.Template
+	logger      *slog.Logger
+	templates   *template.Template
+	trie        *trie.Trie
+	coordinates map[string]cities.City
 }
 
 func main() {
@@ -19,21 +25,24 @@ func main() {
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{}))
 
-	files := []string{
-		"./ui/html/form.tpl",
-		"./ui/html/head.tpl",
-		"./ui/html/response.tpl",
-		"./ui/html/spacer.tpl",
-		"./ui/html/footer.tpl",
-		"./ui/html/pages/index.tpl",
-	}
-	templates, err := template.ParseFiles(files...)
+	templates, err := internal.LoadTemplates()
 	if err != nil {
 		logger.Error("Unable to parse templates!")
 		os.Exit(1)
 	}
 
-	app := &application{logger: logger, templates: templates}
+	cities, coordinates, err := cities.LoadCitiesFromFile(logger)
+	if err != nil {
+		logger.Error("Error reading cities", "error", err)
+	}
+
+	// Load all cities into trie
+	trie := trie.NewTrie()
+	for _, city := range cities {
+		trie.Insert(city.Name)
+	}
+
+	app := &application{logger: logger, templates: templates, trie: trie, coordinates: coordinates}
 	mux := app.routes()
 
 	logger.Info("Starting server", "addr", *addr)

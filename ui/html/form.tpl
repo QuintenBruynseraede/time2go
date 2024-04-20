@@ -46,35 +46,14 @@
               class="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search"
               required
+              hx-get="/search"
+              hx-trigger="keyup changed delay:500ms"
+              hx-target="#search_results"
             />
           </div>
           <!-- Dropdown menu -->
-          <div
-            id="dropdown"
-            class="hidden absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
-          >
-            <ul
-              class="flex-1 py-2 text-sm text-gray-700 dark:text-gray-200"
-              aria-labelledby="dropdownDefaultButton"
-            >
-              <li>
-                <a href="" class="block px-4 py-2 hover:bg-gray-100">Leuven</a>
-              </li>
-              <li>
-                <a href="" class="block px-4 py-2 hover:bg-gray-100"
-                  >Antwerpen</a
-                >
-              </li>
-              <li>
-                <a href="" class="block px-4 py-2 hover:bg-gray-100"
-                  >Brussels</a
-                >
-              </li>
-              <li>
-                <a href="" class="block px-4 py-2 hover:bg-gray-100">Ghent</a>
-              </li>
-            </ul>
-          </div>
+          <div id="search_results">
+         </div>
         </span>
       </div>
       <div class="grid grid-flow-col place-content-center p-2" role="group">
