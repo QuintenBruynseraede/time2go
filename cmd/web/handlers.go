@@ -44,7 +44,7 @@ func (app *application) form(w http.ResponseWriter, r *http.Request) {
 
 	timeLabels := utils.GenerateTimeRangeLabels(timeRange)
 	// TODO hardcoded to Paris coordinates
-	forecast, err := weather.GetForecast(location.Location{Latitude: 48.864716, Longitude: 2.349014}, timeRange)
+	forecast, err := weather.GetForecast(location.Location{Latitude: 52.3676, Longitude: 4.9041}, timeRange)
 	if err != nil {
 		http.Error(w, "Unable to get Weather forecast", http.StatusInternalServerError)
 		return

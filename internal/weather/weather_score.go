@@ -60,18 +60,15 @@ func scoreTemperatureValue(temp int) int {
 		return 10 - (temp - 25)
 	}
 	if temp < 15 {
-		return 10 - (15 - temp)
+		return int(math.Max(0, float64(10-(15-temp))))
 	} else {
 		return 10
 	}
 }
 
 func scoreCloudCoverValue(cloudCover int) int {
-	if cloudCover == 0 {
-		return 10
-	}
 	if cloudCover < 33 {
-		return 6
+		return 5
 	}
 	if cloudCover < 66 {
 		return 3
