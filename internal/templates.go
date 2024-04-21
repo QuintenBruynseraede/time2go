@@ -3,8 +3,7 @@ package internal
 import (
 	"html/template"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
+	"github.com/QuintenBruynseraede/time2go/internal/utils"
 )
 
 func LoadTemplates() (*template.Template, error) {
@@ -18,13 +17,8 @@ func LoadTemplates() (*template.Template, error) {
 		"./ui/html/pages/index.tpl",
 	}
 	funcMap := template.FuncMap{
-		"title": title,
+		"title": utils.Title,
 	}
 
 	return template.New("all").Funcs(funcMap).ParseFiles(files...)
-}
-
-func title(s string) string {
-	caser := cases.Title(language.English)
-	return caser.String(s)
 }

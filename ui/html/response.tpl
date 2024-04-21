@@ -5,7 +5,7 @@
       <div class="">
         <dl class="flex items-center">
           <dt class="text-gray-500 dark:text-gray-400 text-sm font-normal me-1">
-            Recommended moment to go out:
+            Recommended moment to go out near <b>{{.Location}}:</b>
           </dt>
           <dd class="text-gray-900 text-sm dark:text-white font-semibold">
            {{.RecommendedMoment}}

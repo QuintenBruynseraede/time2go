@@ -11,7 +11,7 @@ import (
 
 func GetForecast(lat float64, long float64, timerange timerange.TimeRange) (Forecast, error) {
 	// Returns a forecast for all hours within the timerange
-	url := buildRequestUrl(long, lat)
+	url := buildRequestUrl(lat, long)
 	raw, error := utils.MakeRequest(url)
 
 	if error != nil {

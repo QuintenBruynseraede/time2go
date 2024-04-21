@@ -31,7 +31,6 @@ func (app *application) form(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// location := r.FormValue("location")
 	dateRange := r.FormValue("daterange")
 	duration, err := strconv.Atoi(r.FormValue("duration"))
 	if err != nil {
@@ -42,17 +41,18 @@ func (app *application) form(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Invalid date range", http.StatusBadRequest)
 	}
-
 	timeLabels := utils.GenerateTimeRangeLabels(timeRange)
-	// TODO hardcoded to Paris coordinates
-	forecast, err := weather.GetForecast(52.3676, 4.9041, timeRange)
+
+	city := strings.ToLower(r.FormValue("location"))
+	cityObj := app.coordinates[city]
+	forecast, err := weather.GetForecast(cityObj.Lat, cityObj.Long, timeRange)
 	if err != nil {
 		http.Error(w, "Unable to get Weather forecast", http.StatusInternalServerError)
 		return
 	}
 
 	scores := weather.ScoreForecast(forecast, duration)
-	best := fmt.Sprintf("Between %s and %s", timeLabels[scores.BestIndices[0]], timeLabels[scores.BestIndices[len(scores.BestIndices)-1]])
+	best := fmt.Sprintf("between %s and %s", timeLabels[scores.BestIndices[0]], timeLabels[scores.BestIndices[len(scores.BestIndices)-1]])
 
 	data := models.Response{
 		TimeRangeList: utils.FormatAsJSList(timeLabels, true),
@@ -67,6 +67,7 @@ func (app *application) form(w http.ResponseWriter, r *http.Request) {
 
 		RecommendedMoment:           best,
 		RecommendedTimeRangeIndices: utils.FormatAsJSList(scores.BestIndices, false),
+		Location:                    utils.Title(city),
 	}
 
 	err = app.templates.ExecuteTemplate(w, "response", data)

@@ -14,7 +14,13 @@
 {{end}}
 {{range .}}
     <li>
-      <a href="" class="block px-4 py-2 hover:bg-gray-100">{{title .}}</a>
+      <a
+        href="#"
+        class="block px-4 py-2 hover:bg-gray-100"
+        onclick='document.getElementById("default-search").value="{{title .}}";document.getElementById("dropdown").hidden=true;'
+        >
+      {{title .}}
+      </a>
     </li>
 {{end}}
   </ul>
